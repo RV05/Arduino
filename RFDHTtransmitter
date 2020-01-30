@@ -1,0 +1,36 @@
+
+#include <VirtualWire.h> //Load the library
+#include "DHT.h"        // including the library of DHT11 temperature and humidity sensor
+#define DHTTYPE DHT11   // DHT 11
+
+#define dht_dpin D7
+DHT dht(dht_dpin, DHTTYPE); 
+
+float temp;        //Define the temp float variable
+int sensor = 0;     // sensor middle pin on analog pin 0
+char msg[6];
+float t ;
+float h;
+
+
+void setup()
+{
+   dht.begin();
+    vw_set_tx_pin(12);          // Sets pin D12 as the TX pin
+    vw_setup(2000);          // Bits per sec
+}
+
+void loop()
+{
+    float h = dht.readHumidity();
+    float t = dht.readTemperature(); 
+    
+    temp = analogRead(sensor);        //assigning the analog output to temp
+    temp = temp * 0.48828125;         //converting volts to degrees celsius ----- 0.48828125 = [(5V*1000)/1024]10
+    dtostrf(temp, 6,2,msg);           //converts the float into a char 
+    vw_send((uint8_t *)msg, strlen(msg)); //transmits the data
+    vw_wait_tx(); // Wait until the whole message is gone
+    delay(200);
+ }
+ 
+
