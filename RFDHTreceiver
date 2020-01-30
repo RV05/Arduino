@@ -1,0 +1,64 @@
+//load libraries
+#include <VirtualWire.h>
+#include <Wire.h>
+#include <LCD.h>
+#include <LiquidCrystal_I2C.h>
+
+//Define variables 
+
+#define I2C_ADDR          0x27        //Define I2C Address where the PCF8574A is
+#define BACKLIGHT_PIN      3
+#define En_pin             2
+#define Rw_pin             1
+#define Rs_pin             0
+#define D4_pin             4
+#define D5_pin             5
+#define D6_pin             6
+#define D7_pin             7
+
+//Initialise the LCD
+LiquidCrystal_I2C      lcd(I2C_ADDR, En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
+
+int i;    //and integer used to count
+
+void setup()
+{
+    //Define the LCD as 16 column by 2 rows 
+    lcd.begin (16,2);
+    
+    //Switch on the backlight
+    lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE);
+    lcd.setBacklight(HIGH);
+    
+    //Define the receiver pin and rate
+    vw_set_rx_pin(12);       //Sets pin D12 as the RX Pin
+    vw_setup(2000);       // Bits per sec
+    vw_rx_start();           // Start the receiver PLL running
+}
+
+void loop()
+{
+   uint8_t buf[VW_MAX_MESSAGE_LEN];
+   uint8_t buflen = VW_MAX_MESSAGE_LEN;
+   
+   if( vw_get_message(buf, &buflen) )
+      {
+        lcd.setCursor(0, 0);
+        lcd.print("Temp inside is:");    
+        lcd.setCursor(3,1);  
+        
+       for (i = 0; i < buflen; i++)
+         { 
+           lcd.write(buf[i]); 
+           
+                    
+         }
+        
+           lcd.print((char)223);
+           Serial.print((char)223)
+           lcd.print("C");
+
+      }
+ 
+}
+
